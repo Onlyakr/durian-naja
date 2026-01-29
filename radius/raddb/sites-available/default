@@ -1,0 +1,57 @@
+server default {
+    listen {
+        type = auth
+        ipaddr = *
+        port = 0
+        limit {
+            max_connections = 16
+            lifetime = 0
+            idle_timeout = 30
+        }
+    }
+
+    listen {
+        ipaddr = *
+        port = 0
+        type = acct
+    }
+
+    authorize {
+        # Filter malformed usernames
+        filter_username
+
+        # Preprocess the request
+        preprocess
+
+        # Check credentials against the database
+        sql
+
+        # If we found a password, ensure PAP is used
+        pap
+    }
+
+    authenticate {
+        # PAP authentication
+        Auth-Type PAP {
+            pap
+        }
+    }
+
+    preacct {
+        preprocess
+    }
+
+    accounting {
+        # Not used but section required
+    }
+
+    post-auth {
+        # Post-authentication processing
+    }
+
+    post-auth {
+        Post-Auth-Type Reject {
+            # Handle rejections
+        }
+    }
+}

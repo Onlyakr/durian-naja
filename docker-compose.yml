@@ -14,13 +14,19 @@ services:
 
   # Radius Server
   radius:
-    image: freeradius/freeradius-server:latest
+    build: ./radius
     container_name: durian_radius
     volumes:
       - ./radius/raddb/clients.conf:/etc/raddb/clients.conf
-      - ./radius/raddb/users.txt:/etc/raddb/mods-config/files/authorize
+      - ./radius/raddb/users:/etc/raddb/mods-config/files/authorize
+      - ./radius/raddb/mods-available/sql:/etc/raddb/mods-available/sql
+      - ./radius/raddb/sites-available/default:/etc/raddb/sites-available/default
     ports:
       - "1812:1812/udp"
+    depends_on:
+      - db
+    # Run as root to allow radiusd to drop privileges properly
+    user: root
     command: ["radiusd", "-X"]
 
   # Elysia Backend
