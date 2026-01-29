@@ -10,7 +10,7 @@ const app = new Elysia()
 	.use(
 		jwt({
 			name: "jwt",
-			secret: "Fischl von Luftschloss Narfidort",
+			secret: process.env.JWT_SECRET!,
 		}),
 	)
 	.get("/", () => "Hello Durain naja.")
@@ -50,9 +50,58 @@ const app = new Elysia()
 			});
 		}
 	})
-	.get("/users", async () => {
+	.get("/users/me", async ({ jwt, cookie: { auth } }) => {
 		try {
-			const users = await prisma.user.findMany();
+			const token = auth.value as string | undefined;
+			if (!token) {
+				return status(401, {
+					success: false,
+					message: "Unauthorized - Please login first",
+				});
+			}
+			const profile = await jwt.verify(token);
+			if (!profile) {
+				return status(401, {
+					success: false,
+					message: "Unauthorized - Invalid token",
+				});
+			}
+			return status(200, { success: true, data: profile });
+		} catch (error) {
+			const e = error as Error;
+			return status(500, {
+				success: false,
+				message: e.message || "Internal server error",
+			});
+		}
+	})
+	.get("/users", async ({ jwt, cookie: { auth } }) => {
+		try {
+			const token = auth.value as string | undefined;
+			if (!token) {
+				return status(401, {
+					success: false,
+					message: "Unauthorized - Please login first",
+				});
+			}
+			const profile = await jwt.verify(token);
+			if (!profile) {
+				return status(401, {
+					success: false,
+					message: "Unauthorized - Invalid token",
+				});
+			}
+
+			const users = await prisma.user.findMany({
+				select: {
+					id: true,
+					name: true,
+					email: true,
+					createdAt: true,
+					updatedAt: true,
+					// Exclude password from response
+				},
+			});
 
 			if (!users) {
 				return status(404, { success: false, message: "No users found" });
