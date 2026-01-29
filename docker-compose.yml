@@ -1,0 +1,50 @@
+services:
+  # Database
+  db:
+    image: postgres:15-alpine
+    container_name: durian_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: durian_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Radius Server
+  radius:
+    image: freeradius/freeradius-server:latest
+    container_name: durian_radius
+    volumes:
+      - ./radius/raddb/clients.conf:/etc/raddb/clients.conf
+      - ./radius/raddb/users.txt:/etc/raddb/mods-config/files/authorize
+    ports:
+      - "1812:1812/udp"
+    command: ["radiusd", "-X"]
+
+  # Elysia Backend
+  backend:
+    build: ./backend
+    container_name: durian_backend
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/durian_db
+      RADIUS_SERVER: radius
+      RADIUS_SECRET: testing123
+    depends_on:
+      - db
+      - radius
+
+  # Next.js Frontend
+  frontend:
+    build: ./frontend
+    container_name: durian_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      BACKEND_URL: http://backend:8080
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -1,0 +1,2 @@
+"testuser" Cleartext-Password := "testpass"
+    Reply-Message = "Hello from Docker RADIUS"
