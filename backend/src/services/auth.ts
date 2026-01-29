@@ -2,9 +2,9 @@ import radius from "radius";
 import dgram from "dgram";
 
 const RADIUS_SETTINGS = {
-	host: process.env.RADIUS_SERVER || "radius",
+	host: process.env.RADIUS_SERVER!,
 	port: 1812,
-	secret: process.env.RADIUS_SECRET || "testing123",
+	secret: process.env.RADIUS_SECRET!,
 };
 
 export const authenticateUser = (
