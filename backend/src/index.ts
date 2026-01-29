@@ -3,8 +3,10 @@ import { prisma } from "./lib/prisma";
 import { authenticateUser } from "./services/auth";
 
 import jwt from "@elysiajs/jwt";
+import openapi from "@elysiajs/openapi";
 
 const app = new Elysia()
+	.use(openapi())
 	.use(
 		jwt({
 			name: "jwt",
