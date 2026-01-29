@@ -99,7 +99,6 @@ const app = new Elysia()
 					email: true,
 					createdAt: true,
 					updatedAt: true,
-					// Exclude password from response
 				},
 			});
 
@@ -156,6 +155,28 @@ const app = new Elysia()
 			}),
 		},
 	)
+	.post("/auth/logout", async ({ cookie: { auth } }) => {
+		try {
+			const token = auth.value;
+
+			if (!token) {
+				return status(401, {
+					success: false,
+					message: "Unauthorized - Please login first",
+				});
+			}
+
+			auth.remove();
+
+			return status(200, "Logged out successfully");
+		} catch (error) {
+			const e = error as Error;
+			return status(500, {
+				success: false,
+				message: e.message || "Internal server error",
+			});
+		}
+	})
 	.listen(8080);
 
 console.log(
