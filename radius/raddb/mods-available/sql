@@ -1,0 +1,78 @@
+sql {
+    driver = "rlm_sql_postgresql"
+    dialect = "postgresql"
+
+    # Connection info - connects to Neon PostgreSQL
+    server = "ep-curly-paper-a1vss3x5-pooler.ap-southeast-1.aws.neon.tech"
+    port = 5432
+    login = "neondb_owner"
+    password = "npg_V3v2OzYQmtls"
+    radius_db = "neondb"
+
+    # Connection pool
+    pool {
+        start = 2
+        min = 1
+        max = 5
+        spare = 1
+        uses = 0
+        lifetime = 0
+        idle_timeout = 60
+    }
+
+    read_clients = no
+    client_table = "nas"
+
+    # Set the SQL username from the RADIUS User-Name attribute
+    sql_user_name = "%{User-Name}"
+
+    # Custom SQL queries for your 'user' table
+    # Column names MUST be: id, UserName, Attribute, Value, Op
+    authorize_check_query = "\
+        SELECT \
+            id, \
+            name AS UserName, \
+            'Cleartext-Password' AS Attribute, \
+            password AS Value, \
+            ':=' AS Op \
+        FROM \"user\" \
+        WHERE name = '%{User-Name}'"
+
+    authorize_reply_query = "\
+        SELECT \
+            id, \
+            name AS UserName, \
+            'Reply-Message' AS Attribute, \
+            'Welcome to DURIAN-NAJA!' AS Value, \
+            '=' AS Op \
+        FROM \"user\" \
+        WHERE name = '%{User-Name}'"
+
+    # Disable group queries
+    authorize_group_check_query = ""
+    authorize_group_reply_query = ""
+    group_membership_query = ""
+
+    # Disable simul queries
+    simul_count_query = ""
+    simul_verify_query = ""
+
+    # Disable accounting
+    accounting {
+        type {
+            start {
+                query = ""
+            }
+            interim-update {
+                query = ""
+            }
+            stop {
+                query = ""
+            }
+        }
+    }
+
+    post-auth {
+        query = ""
+    }
+}
