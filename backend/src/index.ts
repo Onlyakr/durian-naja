@@ -13,15 +13,22 @@ const app = new Elysia()
 			secret: process.env.JWT_SECRET!,
 		}),
 	)
-	.get("/", () => "Hello Durain naja.")
-	.get("/durians", async () => {
+	.derive(async ({ jwt, cookie: { auth } }) => {
+		const token = auth.value as string | undefined;
+		const profile = await jwt.verify(token);
+		console.log(profile);
+		return { profile };
+	})
+	.get("/", () => "Hello Durain.")
+	.get("/durians", async ({ profile }) => {
 		try {
+			if (!profile) {
+				return status(401, { success: false, message: "Unauthorized" });
+			}
 			const durians = await prisma.durian.findMany();
-
-			if (!durians) {
+			if (!durians || durians.length === 0) {
 				return status(404, { success: false, message: "No durians found" });
 			}
-
 			return status(200, { success: true, data: durians });
 		} catch (error) {
 			const e = error as Error;
@@ -31,8 +38,11 @@ const app = new Elysia()
 			});
 		}
 	})
-	.get("/durians/:id", async ({ params }) => {
+	.get("/durians/:id", async ({ params, profile }) => {
 		try {
+			if (!profile) {
+				return status(401, { success: false, message: "Unauthorized" });
+			}
 			const durian = await prisma.durian.findUnique({
 				where: {
 					id: params.id,
@@ -50,21 +60,10 @@ const app = new Elysia()
 			});
 		}
 	})
-	.get("/users/me", async ({ jwt, cookie: { auth } }) => {
+	.get("/users/me", async ({ profile }) => {
 		try {
-			const token = auth.value as string | undefined;
-			if (!token) {
-				return status(401, {
-					success: false,
-					message: "Unauthorized - Please login first",
-				});
-			}
-			const profile = await jwt.verify(token);
 			if (!profile) {
-				return status(401, {
-					success: false,
-					message: "Unauthorized - Invalid token",
-				});
+				return status(401, { success: false, message: "Unauthorized" });
 			}
 			return status(200, { success: true, data: profile });
 		} catch (error) {
@@ -75,23 +74,11 @@ const app = new Elysia()
 			});
 		}
 	})
-	.get("/users", async ({ jwt, cookie: { auth } }) => {
+	.get("/users", async ({ profile }) => {
 		try {
-			const token = auth.value as string | undefined;
-			if (!token) {
-				return status(401, {
-					success: false,
-					message: "Unauthorized - Please login first",
-				});
-			}
-			const profile = await jwt.verify(token);
 			if (!profile) {
-				return status(401, {
-					success: false,
-					message: "Unauthorized - Invalid token",
-				});
+				return status(401, { success: false, message: "Unauthorized" });
 			}
-
 			const users = await prisma.user.findMany({
 				select: {
 					id: true,
@@ -101,11 +88,9 @@ const app = new Elysia()
 					updatedAt: true,
 				},
 			});
-
-			if (!users) {
+			if (!users || users.length === 0) {
 				return status(404, { success: false, message: "No users found" });
 			}
-
 			return status(200, { success: true, data: users });
 		} catch (error) {
 			const e = error as Error;
@@ -117,8 +102,11 @@ const app = new Elysia()
 	})
 	.post(
 		"/auth/login",
-		async ({ body, jwt, cookie: { auth } }) => {
+		async ({ body, cookie: { auth }, jwt, profile }) => {
 			try {
+				if (profile) {
+					return status(200, { success: true, message: "Already logged in" });
+				}
 				const isAuthorized = await authenticateUser(body.name, body.password);
 				if (!isAuthorized) {
 					return status(401, {
@@ -126,16 +114,13 @@ const app = new Elysia()
 						message: "Invalid credentials",
 					});
 				}
-
 				const value = await jwt.sign({ name: body.name });
-
 				auth.set({
 					value,
 					httpOnly: true,
 					maxAge: 7 * 86400,
 					path: "/",
 				});
-
 				return status(200, {
 					success: true,
 					message: "Logged in successfully",
@@ -155,20 +140,13 @@ const app = new Elysia()
 			}),
 		},
 	)
-	.post("/auth/logout", async ({ cookie: { auth } }) => {
+	.post("/auth/logout", async ({ cookie: { auth }, profile }) => {
 		try {
-			const token = auth.value;
-
-			if (!token) {
-				return status(401, {
-					success: false,
-					message: "Unauthorized - Please login first",
-				});
+			if (!profile) {
+				return status(401, { success: false, message: "Unauthorized" });
 			}
-
 			auth.remove();
-
-			return status(200, "Logged out successfully");
+			return status(200, { success: true, message: "Logged out successfully" });
 		} catch (error) {
 			const e = error as Error;
 			return status(500, {
