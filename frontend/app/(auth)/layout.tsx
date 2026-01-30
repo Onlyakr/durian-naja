@@ -6,7 +6,7 @@ export default function AuthLayout({
   return (
     <div
       className="flex items-center justify-center min-h-screen
-      bg-[url('/durian.png')]
+      bg-[url('/Frame3.svg')]
       bg-cover
       bg-center
       bg-no-repeat
