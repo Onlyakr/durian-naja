@@ -1,12 +1,13 @@
 import { Elysia, status, t } from "elysia";
 import { prisma } from "./lib/prisma";
 import { authenticateUser } from "./services/auth";
+import { cors } from "@elysiajs/cors";
 
 import jwt from "@elysiajs/jwt";
 import openapi from "@elysiajs/openapi";
-
 const app = new Elysia()
 	.use(openapi())
+	.use(cors({ origin: true, credentials: true }))
 	.use(
 		jwt({
 			name: "jwt",

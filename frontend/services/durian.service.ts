@@ -7,14 +7,26 @@ export interface Durian {
   imageURL: string;
 }
 
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+}
+
 export const DurianService = {
-  getAll: async () => {
-    const response = await axiosInstance.get<Durian[]>("/durians");
-    return response.data;
+  getAll: async (): Promise<Durian[]> => {
+    const response = await axiosInstance.get<ApiResponse<Durian[]>>("/durians");
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.message || "Failed to fetch durians");
+    }
+    return response.data.data;
   },
 
-  getById: async (id: string) => {
-    const response = await axiosInstance.get<Durian>(`/durians/${id}`);
-    return response.data;
+  getById: async (id: string): Promise<Durian> => {
+    const response = await axiosInstance.get<ApiResponse<Durian>>(`/durians/${id}`);
+    if (!response.data.success || !response.data.data) {
+      throw new Error(response.data.message || "Durian not found");
+    }
+    return response.data.data;
   },
 };

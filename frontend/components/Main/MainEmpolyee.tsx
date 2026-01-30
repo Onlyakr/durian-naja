@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Durian {
   id: string;
@@ -32,14 +32,11 @@ export function DurianCard({ durian }: DurianCardProps) {
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="pb-6">
         <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
           {durian.description}
         </p>
       </CardContent>
-
-      <CardFooter>
-      </CardFooter>
     </Card>
   );
 }
