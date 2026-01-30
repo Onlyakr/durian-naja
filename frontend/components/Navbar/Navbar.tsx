@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AuthService, UserProfile } from "@/services/auth.service"; // import
+import { AuthService, UserProfile } from "@/services/auth.service"; 
 
 const Navbar = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
 
-  // ดึงข้อมูลเมื่อโหลดหน้าเว็บ
+
   useEffect(() => {
     const currentUser = AuthService.getCurrentUser();
     setUser(currentUser);
@@ -33,23 +33,18 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         
-        {/* LOGO */}
         <Link href="/" className="font-bold text-xl">DURIAN</Link>
 
-        {/* SEARCH */}
         <div className="hidden md:flex relative w-[300px]">
            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
            <Input placeholder="ค้นหา..." className="pl-9 rounded-full" />
         </div>
-
-        {/* LOGIN / PROFILE */}
         <div className="flex items-center gap-2">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar>
-                    {/* รูปนี้จะมาจาก AuthService ที่เราบังคับไว้ครับ */}
                     <AvatarImage src={user.image} alt={user.username} />
                     <AvatarFallback>{user.username.slice(0, 2).toUpperCase()}</AvatarFallback>
                   </Avatar>

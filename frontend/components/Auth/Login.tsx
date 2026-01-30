@@ -45,7 +45,7 @@ export function LoginForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
 
-      <Card className="w-full max-w-sm shadow-xl bg-white/40 backdrop-blur-md border border-white/40 overflow-hidden">
+      <Card className="max-w-7xl max-w-xl shadow-xl bg-white/40 backdrop-blur-md border border-white/40 overflow-hidden">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">เข้าสู่ระบบ</CardTitle>
         </CardHeader>
