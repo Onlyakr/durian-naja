@@ -1,4 +1,4 @@
-import radius from "radius";
+import radius from "radius"
 import dgram from "dgram";
 
 const RADIUS_SETTINGS = {
