@@ -1,34 +1,42 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, LogOut } from "lucide-react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { AuthService, UserProfile } from "@/services/auth.service";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+interface User {
+	name: string;
+}
 
 const Navbar = () => {
-	const [user, setUser] = useState<UserProfile | null>(null);
+	const router = useRouter();
+	const [user, setUser] = useState<User | null>(null);
 
 	useEffect(() => {
 		const fetchUser = async () => {
-			const currentUser = await AuthService.getCurrentUser();
-			setUser(currentUser);
+			try {
+				const res = await fetch("/api/users/me", {
+					credentials: "include",
+				});
+				if (!res.ok) return;
+				const { data } = await res.json();
+				console.log(data);
+				setUser(data);
+			} catch {
+				// Not logged in
+			}
 		};
 		fetchUser();
 	}, []);
 
-	const handleLogout = () => {
-		AuthService.logout();
+	const handleLogout = async () => {
+		await fetch("/api/auth/logout", {
+			method: "POST",
+			credentials: "include",
+		});
+		setUser(null);
+		router.push("/");
 	};
 
 	return (
@@ -37,52 +45,33 @@ const Navbar = () => {
 				<Link href="/" className="font-bold text-xl">
 					DURIAN
 				</Link>
-
-				<div className="hidden md:flex relative w-[300px]">
+				{/* <div className="hidden md:flex relative w-[300px]">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 					<Input placeholder="ค้นหา..." className="pl-9 rounded-full" />
-				</div>
+				</div> */}
 				<div className="flex items-center gap-2">
 					{user ? (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="ghost"
-									className="relative h-10 w-10 rounded-full"
-								>
-									<Avatar>
-										<AvatarImage src={user.image} alt={user.name} />
-										<AvatarFallback>
-											{/* {user.name.slice(0, 2).toUpperCase()} */}
-											LR
-										</AvatarFallback>
-									</Avatar>
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								<DropdownMenuLabel>
-									<p>{user.name}</p>
-									<p className="text-xs text-muted-foreground">{user.email}</p>
-								</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem
-									className="text-red-600 cursor-pointer"
-									onClick={handleLogout}
-								>
-									<LogOut className="mr-2 h-4 w-4" /> Logout
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+						<div className="flex items-center gap-4">
+							<span className="text-sm text-muted-foreground">
+								สวัสดี,{" "}
+								<span className="font-medium text-foreground">{user.name}</span>
+							</span>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={handleLogout}
+								className="cursor-pointer"
+							>
+								Logout
+							</Button>
+						</div>
 					) : (
 						<div className="flex gap-2">
-							<Button variant="ghost" asChild>
+							<Button variant="secondary" asChild>
 								<Link href="/login">Login</Link>
 							</Button>
-							<Button
-								className="bg-yellow-500 text-black hover:bg-yellow-600"
-								asChild
-							>
-								<Link href="/signup">Sign Up</Link>
+							<Button asChild>
+								<Link href="/register">Register</Link>
 							</Button>
 						</div>
 					)}

@@ -5,13 +5,17 @@ import { cors } from "@elysiajs/cors";
 
 import jwt from "@elysiajs/jwt";
 import openapi from "@elysiajs/openapi";
+
+if (!process.env.JWT_SECRET) {
+	throw new Error("JWT_SECRET is not set");
+}
 const app = new Elysia()
 	.use(openapi())
-	.use(cors({ origin: true, credentials: true }))
+	.use(cors({ origin: true }))
 	.use(
 		jwt({
 			name: "jwt",
-			secret: process.env.JWT_SECRET!,
+			secret: process.env.JWT_SECRET,
 		}),
 	)
 	.derive(async ({ jwt, cookie: { auth } }) => {
@@ -161,3 +165,5 @@ const app = new Elysia()
 console.log(
 	`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
+
+export type App = typeof app;
