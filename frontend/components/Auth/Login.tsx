@@ -1,21 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { AuthService } from "@/services/auth.service";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function LoginForm({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
 	const router = useRouter();
-	const [username, setUsername] = useState("");
+	const [name, setName] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
@@ -26,7 +25,16 @@ export function LoginForm({
 		setError("");
 
 		try {
-			await AuthService.login(username, password);
+			const res = await fetch(`/api/auth/login`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify({ name, password }),
+			});
+
+			const data = await res.json();
+			console.log(data);
+
 			router.push("/employee");
 			router.refresh();
 		} catch (err) {
@@ -39,7 +47,7 @@ export function LoginForm({
 
 	return (
 		<div className={cn("flex flex-col gap-6", className)} {...props}>
-			<Card className="max-w-7xl max-w-xl shadow-xl bg-white/40 backdrop-blur-md border border-white/40 overflow-hidden">
+			<Card className="max-w-7xl shadow-xl bg-white/40 backdrop-blur-md border border-white/40 overflow-hidden">
 				<CardHeader className="text-center">
 					<CardTitle className="text-2xl font-bold">เข้าสู่ระบบ</CardTitle>
 				</CardHeader>
@@ -54,18 +62,15 @@ export function LoginForm({
 							)}
 
 							<div className="grid gap-2">
-								<Label
-									htmlFor="username"
-									className="font-semibold text-gray-800"
-								>
-									Username
+								<Label htmlFor="name" className="font-semibold text-gray-800">
+									Name
 								</Label>
 								<Input
-									id="username"
+									id="name"
 									type="text"
 									required
-									value={username}
-									onChange={(e) => setUsername(e.target.value)}
+									value={name}
+									onChange={(e) => setName(e.target.value)}
 									disabled={isLoading}
 									className="bg-white/60 border-white/50 focus:bg-white"
 								/>
