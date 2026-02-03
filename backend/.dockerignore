@@ -1,0 +1,40 @@
+# Dependencies
+node_modules
+
+# Environment files
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+
+# IDE/Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Logs
+*.log
+logs
+
+# Prisma generated (regenerated in container)
+prisma/generated
+
+# Build artifacts
+dist
+build
+
+# Test files
+*.test.ts
+*.spec.ts
+__tests__
+
+# Documentation
+README.md

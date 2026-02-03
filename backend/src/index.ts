@@ -9,6 +9,7 @@ import openapi from "@elysiajs/openapi";
 if (!process.env.JWT_SECRET) {
 	throw new Error("JWT_SECRET is not set");
 }
+
 const app = new Elysia()
 	.use(openapi())
 	.use(cors({ origin: true }))

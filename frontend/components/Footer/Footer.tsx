@@ -7,7 +7,7 @@ const Footer = () => {
 		{ name: "Thanyawut Leewangsri", ig: "https://www.instagram.com/jxegyy/" },
 		{ name: "Ploychompu loedpananon", ig: "https://www.instagram.com/_47px/" },
 		{ name: "Akarawin Datchanee", ig: "https://www.instagram.com/onlyakr_/" },
-		{ name: "เต็ง", ig: "https://instagram.com/..." },
+		{ name: "Chayatorn Raethong", ig: "/" },
 	];
 
 	return (

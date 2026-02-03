@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../prisma/generated/prisma"
 }
 
 generator prismabox {
@@ -8,7 +8,7 @@ generator prismabox {
   typeboxImportDependencyName = "elysia"
   typeboxImportVariableName   = "t"
   inputModel                  = true
-  output                      = "../src/generated/prismabox"
+  output                      = "../prisma/generated/prismabox"
 }
 
 datasource db {
@@ -27,12 +27,13 @@ model User {
 } 
 
 model Durian {
-  id        String   @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
+  variety     String
   description String
   imageURL    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("durian")
 }
