@@ -35,7 +35,6 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
-      SCRIPT_NAME: /pgadmin
     depends_on:
       - db
     restart: always
