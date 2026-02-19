@@ -26,6 +26,20 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: always
 
+  # pgAdmin (PostgreSQL Admin)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: durian_pgadmin
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      SCRIPT_NAME: /pgadmin
+    depends_on:
+      - db
+    restart: always
+
   # Radius Server
   radius:
     build: ./radius
@@ -70,5 +84,6 @@ services:
     depends_on:
       - backend
     restart: always
+    
 volumes:
   postgres_data:
